@@ -4,6 +4,6 @@ from time import sleep
 button = Button(2)
 
 while True:
-    print(f"Is pressed: {button.is_pressed()}")
+    print(f"Is pressed: {button.value}")
     sleep(0.1)    
 
