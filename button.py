@@ -1,6 +1,9 @@
 from gpiozero import Button
+from time import sleep
+
 button = Button(2)
 
-button.wait_for_press()
-print('You pushed me')
+while True:
+    print(f"Is pressed: {button.is_pressed()}")
+    sleep(0.1)    
 
