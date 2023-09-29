@@ -1,5 +1,5 @@
-int VRX_PIN = 4;
-int VRY_PIN = 0;
+int VRX_PIN = 34;
+int VRY_PIN = 35;
 int OUT_PIN = 16;
 int JBUTTON = 5;
 
@@ -14,11 +14,11 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  float vrxVal = analogRead(VRX_PIN);
-  float vryVal = analogRead(VRY_PIN);
-  Serial.print("VRX: ");
-  Serial.println(vrxVal);
-  Serial.print("VRY: ");
-  Serial.println(vryVal);
-  // Serial.println("Button: " + digitalRead(JBUTTON));
+  String printOut = "VRX: ";
+  printOut += analogRead(VRX_PIN);
+  printOut += " VRY: ";
+  printOut += analogRead(VRY_PIN);
+  // Serial.println("VRX: " + analogRead(VRX_PIN) + " VRY: " + analogRead(VRY_PIN));
+  // Serial.println(printOut);
+  Serial.println("Button: " + digitalRead(JBUTTON));
 }
