@@ -13,12 +13,60 @@ float rainAmp = 0.01;
 
 SoundFile[] mainSounds;
 float mainAmp = 0.3;
-String[] songPaths = {"sounds/ichigo_parfum.wav", "sounds/heavens_gate.wav"};
+String[] songPaths = {"sounds/ichigo_parfum.wav", "sounds/heavens_gate.wav", "sounds/subwoofer_lullaby.wav"};
 int currentSong = 1;
+Amplitude currentSongAmpDetector;
 
 SoundFile[] thunderSounds;
 String[] thunderPaths = {"sounds/thunder1.wav", "sounds/thunder2.wav", "sounds/thunder3.wav"};
 int lastThunderTime = 0;
+
+BezierNode[] bzNodes;
+int numBzNodes;
+
+
+class BezierNode {
+
+    float bzAnchorX1, bzAnchorY1, bzAnchorX2, bzAnchorY2, bzControlX1, bzControlY1, bzControlX2, bzControlY2;
+    float curveT;
+
+    public BezierNode () {
+        randomizeBezierPoints();
+
+        this.curveT = 0;
+    }
+
+    public void advanceNodeOnPath(float delta) {
+        this.curveT += delta;
+
+        if (this.curveT < 1) {
+            float x = bezierPoint(this.bzAnchorX1, this.bzControlX1, this.bzControlX2, this.bzAnchorX2, this.curveT);
+            float y = bezierPoint(this.bzAnchorY1, this.bzControlY1, this.bzControlY2, this.bzAnchorY2, this.curveT);
+            ellipse(x, y, 15, 15);
+        } else {
+            float startX = this.bzAnchorX2;
+            float startY = this.bzAnchorY2;
+            this.curveT = 0;
+
+            randomizeBezierPoints();
+            this.bzAnchorX1 = startX;
+            this.bzAnchorY1 = startY;
+        }
+    }
+
+    private void randomizeBezierPoints() {
+        this.bzAnchorX1 = int(random(0, width));
+        this.bzAnchorX2 = int(random(0, width));
+        this.bzControlX1 = int(random(0, width));
+        this.bzControlX2 = int(random(0, width));
+        this.bzAnchorY1 = int(random(0, height));
+        this.bzAnchorY2 = int(random(0, height));
+        this.bzControlY1 = int(random(0, height));
+        this.bzControlY2 = int(random(0, height));
+    }
+
+}
+
 
 void adjustRainVolume(float adj) {
     rainAmp = rainAmp + adj <= RAIN_MAX && rainAmp + adj >= RAIN_MIN ? rainAmp + adj : rainAmp;
@@ -32,6 +80,7 @@ void playNextSong() {
     currentSong = (currentSong + 1) % songPaths.length;
     mainSounds[currentSong].jump(0);
     mainSounds[currentSong].amp(mainAmp);
+    currentSongAmpDetector.input(mainSounds[currentSong]);
 }
 
 // called every time switch is flipped
@@ -66,9 +115,10 @@ void playThunder() {
 }
 
 void setup() {
-    size(512, 512);    // for debugging
-    // fullScreen();   // for prod
-
+    // size(512, 512);    // for debugging
+    fullScreen();   // for prod
+    stroke(102, 106, 134);
+    fill(146, 182, 177);
 
     mainSounds = new SoundFile[songPaths.length];
     for (int i = 0; i < songPaths.length; i++) {
@@ -80,16 +130,34 @@ void setup() {
         thunderSounds[i] = new SoundFile(this, thunderPaths[i]);
     }
 
+    numBzNodes = int(sqrt(height*width)/50);
+    bzNodes = new BezierNode[numBzNodes];
+    for (int i = 0; i < numBzNodes; i++) {
+        bzNodes[i] = new BezierNode();
+    }
+
     rainSound = new SoundFile(this, "sounds/rain.wav");
     rainSound.amp(rainAmp);
     rainSound.loop();
 
-    currentSong = int(random(0, songPaths.length));
+    currentSongAmpDetector = new Amplitude(this);
+
+    // currentSong = int(random(0, songPaths.length));
+    currentSong = 0;
     playNextSong();
+    
 }
 
-void draw() {
 
+void draw() {
+    background(232, 221, 181);
+    float currentAmp = currentSongAmpDetector.analyze();
+    println(currentAmp);
+    float bzDelta = mainSounds[currentSong].isPlaying() ? currentAmp/5 : 0;
+
+    for (int i = 0; i < numBzNodes; i++) {
+        bzNodes[i].advanceNodeOnPath(bzDelta);
+    }
 }
 
 // for testing purposes only
