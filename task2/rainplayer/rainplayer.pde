@@ -55,14 +55,14 @@ class BezierNode {
     }
 
     private void randomizeBezierPoints() {
-        this.bzAnchorX1 = int(random(0, width));
-        this.bzAnchorX2 = int(random(0, width));
-        this.bzControlX1 = int(random(0, width));
-        this.bzControlX2 = int(random(0, width));
-        this.bzAnchorY1 = int(random(0, height));
-        this.bzAnchorY2 = int(random(0, height));
-        this.bzControlY1 = int(random(0, height));
-        this.bzControlY2 = int(random(0, height));
+        this.bzAnchorX1 = int(random(width*rainAmp, width*(1-rainAmp)));
+        this.bzAnchorX2 = int(random(width*rainAmp, width*(1-rainAmp)));
+        this.bzControlX1 = int(random(width*rainAmp, width*(1-rainAmp)));
+        this.bzControlX2 = int(random(width*rainAmp, width*(1-rainAmp)));
+        this.bzAnchorY1 = int(random(height*rainAmp, height*(1-rainAmp)));
+        this.bzAnchorY2 = int(random(height*rainAmp, height*(1-rainAmp)));
+        this.bzControlY1 = int(random(height*rainAmp, height*(1-rainAmp)));
+        this.bzControlY2 = int(random(height*rainAmp, height*(1-rainAmp)));
     }
 
 }
@@ -95,7 +95,6 @@ void setPlaying(boolean shouldPlay) {
 }
 
 // called every time button is pressed
-// TODO: raise volume of thunder
 void playThunder() {
     // prevent phantom thunder from button press
     if (millis() - lastThunderTime > THUNDER_THRESHOLD) {
