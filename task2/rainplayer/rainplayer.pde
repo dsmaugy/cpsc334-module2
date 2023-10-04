@@ -9,9 +9,13 @@ final int THUNDER_THRESHOLD = 100;
 final float THUNDER_MIN = 0.65;
 final float THUNDER_MAX = 0.7;
 final String ESP32_PORT = "COM3";
+final float JOY_MIN = 1000;
+final float JOY_MAX = 3000;
+final float RAIN_UPDATE_THRESH = 50;
 
 SoundFile rainSound;
 float rainAmp = 0.01;
+float lastRainAmpUpdate = 0;
 
 SoundFile[] mainSounds;
 float mainAmp = 0.3;
@@ -59,22 +63,27 @@ class BezierNode {
     }
 
     private void randomizeBezierPoints() {
-        this.bzAnchorX1 = int(random(width*rainAmp, width*(1-rainAmp)));
-        this.bzAnchorX2 = int(random(width*rainAmp, width*(1-rainAmp)));
-        this.bzControlX1 = int(random(width*rainAmp, width*(1-rainAmp)));
-        this.bzControlX2 = int(random(width*rainAmp, width*(1-rainAmp)));
-        this.bzAnchorY1 = int(random(height*rainAmp, height*(1-rainAmp)));
-        this.bzAnchorY2 = int(random(height*rainAmp, height*(1-rainAmp)));
-        this.bzControlY1 = int(random(height*rainAmp, height*(1-rainAmp)));
-        this.bzControlY2 = int(random(height*rainAmp, height*(1-rainAmp)));
+        float adjustment = rainAmp * 1.2;
+        this.bzAnchorX1 = int(random(width*adjustment, width*(1-adjustment)));
+        this.bzAnchorX2 = int(random(width*adjustment, width*(1-adjustment)));
+        this.bzControlX1 = int(random(width*adjustment, width*(1-adjustment)));
+        this.bzControlX2 = int(random(width*adjustment, width*(1-adjustment)));
+        this.bzAnchorY1 = int(random(height*adjustment, height*(1-adjustment)));
+        this.bzAnchorY2 = int(random(height*adjustment, height*(1-adjustment)));
+        this.bzControlY1 = int(random(height*adjustment, height*(1-adjustment)));
+        this.bzControlY2 = int(random(height*adjustment, height*(1-adjustment)));
     }
 
 }
 
 
 void adjustRainVolume(float adj) {
-    rainAmp = rainAmp + adj <= RAIN_MAX && rainAmp + adj >= RAIN_MIN ? rainAmp + adj : rainAmp;
-    rainSound.amp(rainAmp);
+    if (millis() - lastRainAmpUpdate > RAIN_UPDATE_THRESH) {
+        rainAmp = rainAmp + adj <= RAIN_MAX && rainAmp + adj >= RAIN_MIN ? rainAmp + adj : rainAmp;
+        rainSound.amp(rainAmp);
+        lastRainAmpUpdate = millis();
+    }
+
 }
 
 void playNextSong() {
@@ -141,7 +150,6 @@ void setup() {
 
     rainSound = new SoundFile(this, "sounds/rain.wav");
     rainSound.amp(rainAmp);
-    rainSound.loop();
 
     currentSongAmpDetector = new Amplitude(this);
 
@@ -149,7 +157,7 @@ void setup() {
     currentSong = 0;
 
     printArray(Serial.list());
-    esp32 = new Serial(this, ESP32_PORT, 9600);
+    esp32 = new Serial(this, ESP32_PORT, 115200);
     esp32.bufferUntil('\n');
 }
 
@@ -184,9 +192,15 @@ void keyPressed() {
 void serialEvent(Serial p) { 
     String serialEvent = p.readString(); 
     print(serialEvent);
-    if (serialEvent.startsWith("VRX:")) {
-        int joyVal = int(serialEvent.substring(5));
+    if (serialEvent.startsWith("VRY:")) {
+        int joyVal = int(serialEvent.substring(5).trim());
+        println("JOY VALUE: " + joyVal);
 
+        if (joyVal <= JOY_MIN) {
+            adjustRainVolume(RAIN_DELTA);
+        } else if (joyVal >= JOY_MAX) {
+            adjustRainVolume(-RAIN_DELTA);
+        }
     } else if (serialEvent.startsWith("SWITCH:")) {
         int switchVal = int(serialEvent.substring(8).trim());
 
