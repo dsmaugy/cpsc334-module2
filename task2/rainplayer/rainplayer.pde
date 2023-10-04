@@ -1,4 +1,5 @@
 import processing.sound.*;
+import processing.serial.*;
 
 // constants
 final float RAIN_MAX = 0.3;
@@ -7,6 +8,7 @@ final float RAIN_DELTA = 0.001;
 final int THUNDER_THRESHOLD = 100;
 final float THUNDER_MIN = 0.65;
 final float THUNDER_MAX = 0.7;
+final String ESP32_PORT = "COM3";
 
 SoundFile rainSound;
 float rainAmp = 0.01;
@@ -23,6 +25,8 @@ int lastThunderTime = 0;
 
 BezierNode[] bzNodes;
 int numBzNodes;
+
+Serial esp32;
 
 
 class BezierNode {
@@ -143,15 +147,17 @@ void setup() {
 
     // currentSong = int(random(0, songPaths.length));
     currentSong = 0;
-    playNextSong();
-    
+
+    printArray(Serial.list());
+    esp32 = new Serial(this, ESP32_PORT, 9600);
+    esp32.bufferUntil('\n');
 }
 
 
 void draw() {
     background(232, 221, 181);
     float currentAmp = currentSongAmpDetector.analyze();
-    println(currentAmp);
+    // println(currentAmp);
     float bzDelta = mainSounds[currentSong].isPlaying() ? currentAmp/5 : 0;
 
     for (int i = 0; i < numBzNodes; i++) {
@@ -174,6 +180,23 @@ void keyPressed() {
         playThunder();
     }
 }
+
+void serialEvent(Serial p) { 
+    String serialEvent = p.readString(); 
+    print(serialEvent);
+    if (serialEvent.startsWith("VRX:")) {
+        int joyVal = int(serialEvent.substring(5));
+
+    } else if (serialEvent.startsWith("SWITCH:")) {
+        int switchVal = int(serialEvent.substring(8).trim());
+
+        if (switchVal == 1) {
+            setPlaying(true);
+        } else if (switchVal == 0) {
+            setPlaying(false);
+        }     
+    }
+} 
 
 // TODO: lever -> disable/enable sounds
 // TODO: button -> play thunders (randomized filter values)
