@@ -197,16 +197,16 @@ void serialEvent(Serial p) {
         //println("JOY VALUE: " + joyVal);
 
         if (joyVal <= JOY_MIN) {
-            adjustRainVolume(RAIN_DELTA);
-        } else if (joyVal >= JOY_MAX) {
             adjustRainVolume(-RAIN_DELTA);
+        } else if (joyVal >= JOY_MAX) {
+            adjustRainVolume(RAIN_DELTA);
         }
     } else if (serialEvent.startsWith("SWITCH:")) {
         int switchVal = int(serialEvent.substring(8).trim());
 
-        if (switchVal == 1) {
+        if (switchVal == 0) {
             setPlaying(true);
-        } else if (switchVal == 0) {
+        } else if (switchVal == 1) {
             setPlaying(false);
         }     
     } else if (serialEvent.startsWith("BUT:")) {
