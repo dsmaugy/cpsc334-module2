@@ -127,8 +127,8 @@ void playThunder() {
 }
 
 void setup() {
-    size(512, 512);    // for debugging
-    // fullScreen();   // for prod
+    // size(512, 512);    // for debugging
+    fullScreen();   // for prod
     stroke(102, 106, 134);
     fill(146, 182, 177);
 
