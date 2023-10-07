@@ -8,9 +8,9 @@ final float RAIN_DELTA = 0.001;
 final int THUNDER_THRESHOLD = 100;
 final float THUNDER_MIN = 0.65;
 final float THUNDER_MAX = 0.7;
-final String ESP32_PORT = "COM3";
+final String ESP32_PORT = "/dev/ttyUSB0";
 final float JOY_MIN = 1000;
-final float JOY_MAX = 3000;
+final float JOY_MAX = 2000;
 final float RAIN_UPDATE_THRESH = 50;
 
 SoundFile rainSound;
@@ -191,10 +191,10 @@ void keyPressed() {
 
 void serialEvent(Serial p) { 
     String serialEvent = p.readString(); 
-    print(serialEvent);
-    if (serialEvent.startsWith("VRY:")) {
+    //print(serialEvent);
+    if (serialEvent.startsWith("VRX:")) {
         int joyVal = int(serialEvent.substring(5).trim());
-        println("JOY VALUE: " + joyVal);
+        //println("JOY VALUE: " + joyVal);
 
         if (joyVal <= JOY_MIN) {
             adjustRainVolume(RAIN_DELTA);
@@ -209,6 +209,12 @@ void serialEvent(Serial p) {
         } else if (switchVal == 0) {
             setPlaying(false);
         }     
+    } else if (serialEvent.startsWith("BUT:")) {
+        int buttonVal = int(serialEvent.substring(5).trim());
+        
+        if (buttonVal == 1) {
+            playThunder();
+        }
     }
 } 
 
