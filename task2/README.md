@@ -1,6 +1,7 @@
 # Task 2
 
 Ambient rainplayer.
+See [writeup](docs/writeup.md)
 
 # Sounds
 Rain sounds from [freesound.org](https://freesound.org/people/inuetc/sounds/507902/)
