@@ -3,6 +3,9 @@
 Ambient rainplayer.
 See [writeup](docs/writeup.md)
 
+[![Demo](https://img.youtube.com/vi/_TbbDGC6yNM/0.jpg)](https://www.youtube.com/watch?v=_TbbDGC6yNM)
+
+
 # Sounds
 Rain sounds from [freesound.org](https://freesound.org/people/inuetc/sounds/507902/)
 
