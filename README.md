@@ -3,7 +3,7 @@
 ## Task 1:
 Completed by Darwin Do and Maggie Schnyer
 
-## Task 2:
+## Task 2 - Rainplayer:
 Completed by Darwin Do
 
 ## Lab 3:
