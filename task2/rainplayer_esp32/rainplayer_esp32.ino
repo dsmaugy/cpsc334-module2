@@ -13,13 +13,7 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   Serial.println(String("VRX: ") + analogRead(VRX_PIN));
-  // Serial.println(String("VRY: ") + analogRead(VRY_PIN));
   Serial.println(String("SWITCH: ") + !digitalRead(SWITCH_PIN));
   Serial.println(String("BUT: ") + !digitalRead(BUTTON_PIN));
 
-
-  // THIS PRINTS OUT WEIRD STUFF?!?!
-  // Serial.println("VRX: " + analogRead(VRX_PIN));
-  // Serial.println("VRY: " + analogRead(VRY_PIN));
-  // Serial.println("SWITCH: " + digitalRead(SWITCH_PIN));
 }

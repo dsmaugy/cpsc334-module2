@@ -153,7 +153,6 @@ void setup() {
 
     currentSongAmpDetector = new Amplitude(this);
 
-    // currentSong = int(random(0, songPaths.length));
     currentSong = 0;
 
     printArray(Serial.list());
@@ -164,8 +163,9 @@ void setup() {
 
 void draw() {
     background(232, 221, 181);
+
+    // node movement speed dependant on background song amplitude
     float currentAmp = currentSongAmpDetector.analyze();
-    // println(currentAmp);
     float bzDelta = mainSounds[currentSong].isPlaying() ? currentAmp/5 : 0;
 
     for (int i = 0; i < numBzNodes; i++) {
@@ -191,10 +191,8 @@ void keyPressed() {
 
 void serialEvent(Serial p) { 
     String serialEvent = p.readString(); 
-    //print(serialEvent);
     if (serialEvent.startsWith("VRX:")) {
         int joyVal = int(serialEvent.substring(5).trim());
-        //println("JOY VALUE: " + joyVal);
 
         if (joyVal <= JOY_MIN) {
             adjustRainVolume(-RAIN_DELTA);
@@ -218,6 +216,3 @@ void serialEvent(Serial p) {
     }
 } 
 
-// TODO: lever -> disable/enable sounds
-// TODO: button -> play thunders (randomized filter values)
-// TODO: joystick -> adjust rain volume
